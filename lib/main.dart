@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo/keys/keys.dart';
+import 'keys/keys.dart';
 // import 'package:flutter_internals/ui_updates_demo.dart';
 // import 'package:flutter/todo/keys.dart';
 
@@ -18,15 +18,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(useMaterial3: true),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter Internals'),
-          actions: [
-            IconButton(onPressed: (){}, icon: Icon(Icons.add))
-          ],
-        ),
-        body: const Keys(),
-      ),
+      home: Keys(),
     );
   }
 }

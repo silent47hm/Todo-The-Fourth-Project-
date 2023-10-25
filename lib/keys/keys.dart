@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo/keys/checkable_todo_item.dart';
+import 'checkable_todo_item.dart';
 // import 'package:flutter_internals/keys/checkable_todo_item.dart';
 // import 'package:flutter_internals/keys/todo_item.dart';
 
@@ -20,6 +20,7 @@ class Keys extends StatefulWidget {
 }
 
 class _KeysState extends State<Keys> {
+  final TextEditingController titleController = TextEditingController();
   var _order = 'asc';
   final _todos = [
     const Todo(
@@ -51,34 +52,91 @@ class _KeysState extends State<Keys> {
     });
   }
 
+  void addItem(String titleText, Priority priority) {
+    setState(() {
+      _todos.add(Todo(titleText, priority));
+    });
+  }
+
+  void showSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 600,
+          color: Color.fromARGB(255, 241, 249, 253),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('AddTodoItem'),
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      labelText: 'Enter Name',
+                      hintText: 'Enter Your Name'),
+                ),
+                ElevatedButton(
+                    child: const Text('Close BottomSheet'),
+                    onPressed: () {
+                      addItem(titleController.text, Priority.normal);
+                      Navigator.pop(context);
+                    }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    titleController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton.icon(
-            onPressed: _changeOrder,
-            icon: Icon(
-              _order == 'asc' ? Icons.arrow_downward : Icons.arrow_upward,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter Internals'),
+        actions: [IconButton(onPressed: showSheet, icon: Icon(Icons.add))],
+      ),
+      body: Column(
+        children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: _changeOrder,
+              icon: Icon(
+                _order == 'asc' ? Icons.arrow_downward : Icons.arrow_upward,
+              ),
+              label:
+                  Text('Sort ${_order == 'asc' ? 'Descending' : 'Ascending'}'),
             ),
-            label: Text('Sort ${_order == 'asc' ? 'Descending' : 'Ascending'}'),
           ),
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              // for (final todo in _orderedTodos) TodoItem(todo.text, todo.priority),
-              for (final todo in _orderedTodos)
-                CheckableTodoItem(
-                  key: ObjectKey(todo), // ValueKey()
-                  todo.text,
-                  todo.priority,
-                ),
-            ],
+          Expanded(
+            child: Column(
+              children: [
+                // for (final todo in _orderedTodos) TodoItem(todo.text, todo.priority),
+                for (final todo in _orderedTodos)
+                  Dismissible(
+                    key: ObjectKey(todo),
+                    child: CheckableTodoItem(
+                      // ValueKey()
+                      todo.text,
+                      todo.priority,
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
